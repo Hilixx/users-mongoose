@@ -1,4 +1,6 @@
 const User = require('../models/Users')
+const jwt = require('jsonwebtoken')
+const secret = 'any'
 
 module.exports = class controller{
 
@@ -13,17 +15,22 @@ module.exports = class controller{
     static async loginUser(req,res){
         const login = req.body.login
         const password = req.body.password
-        console.log(login,password)
         const loginAuth = await User.findOne({login: login})
+        const userId = loginAuth.id
         const passAuth = await User.findOne({password: password})
+
+
         if(loginAuth && passAuth){
-            res.status(200).end(`bem vindo: ${login}`)
+            
+            const token = jwt.sign({userId}, secret, {expiresIn:300})
+            res.status(200).end(`bem vindo: ${login} \n\ntoken: ${token}`)
         }else{
             res.status(401).end('acesso negado')
         }
         
         
     }
+    
 
     
 }   
